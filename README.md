@@ -95,14 +95,14 @@ Search files by name and star your important files.
 ### 🗑️ Trash Functionality
 Move files to Trash and manage deleted items.
 
-![Trash](./screenshots/Trash_Functionality.png)
+![Trash](./screenshots/Trash_functionality.png)
 
 ---
 
 ### 📤 Upload Functionality
 Upload files with a click or drag-and-drop.
 
-![Upload](./screenshots/Upload_functionality.png)
+![Upload](./screenshots/upload_functionality.png)
 
 ---
 
