@@ -32,3 +32,32 @@
   justify-content: center;
   gap: 10px; /* 👈 Add this to reduce space between image and text */
 }
+
+/* Make the main area flex properly */
+.main-layout {
+  display: flex;
+  height: 100vh; /* full height */
+}
+
+/* Sidebar stays fixed width */
+.sidebar {
+  width: 200px; 
+  background-color: #f5f5f5;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Content area fills rest */
+.content-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Files grid styles */
+.files-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+

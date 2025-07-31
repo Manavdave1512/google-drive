@@ -8,26 +8,27 @@ import axios from "axios";
 function DriveApp() {
   const [files, setFiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewTrash, setViewTrash] = useState(false); 
+  const [viewTrash, setViewTrash] = useState(false);
   const [viewStarred, setViewStarred] = useState(false);
-console.log("viewStarred:", viewStarred, "viewTrash:", viewTrash);
+
+  console.log("viewStarred:", viewStarred, "viewTrash:", viewTrash);
+
   const loadFiles = async () => {
-  try {
-    let endpoint = "http://localhost:8080/api/files/list";
-    if (viewTrash) endpoint = "http://localhost:8080/api/files/trash";
-    else if (viewStarred) endpoint = "http://localhost:8080/api/files/starred";
+    try {
+      let endpoint = "http://localhost:8080/api/files/list";
+      if (viewTrash) endpoint = "http://localhost:8080/api/files/trash";
+      else if (viewStarred) endpoint = "http://localhost:8080/api/files/starred";
 
-    const res = await axios.get(endpoint);
-    setFiles(res.data);
-  } catch (error) {
-    console.error("Failed to load files:", error);
-  }
-};
-
+      const res = await axios.get(endpoint);
+      setFiles(res.data);
+    } catch (error) {
+      console.error("Failed to load files:", error);
+    }
+  };
 
   useEffect(() => {
     loadFiles();
-  }, [viewTrash,viewStarred]); // run on view change
+  }, [viewTrash, viewStarred]); // reload when view changes
 
   const handleUploadFromSidebar = async (file) => {
     const formData = new FormData();
@@ -37,7 +38,7 @@ console.log("viewStarred:", viewStarred, "viewTrash:", viewTrash);
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    loadFiles(); // refresh view after upload
+    loadFiles(); // refresh view
   };
 
   const handleDownload = (id) => {
@@ -45,9 +46,9 @@ console.log("viewStarred:", viewStarred, "viewTrash:", viewTrash);
   };
 
   const handleToggleStar = async (id) => {
-  await axios.put(`http://localhost:8080/api/files/${id}/star`);
-  loadFiles(); // reload view
-};
+    await axios.put(`http://localhost:8080/api/files/${id}/star`);
+    loadFiles();
+  };
 
   const handleDelete = async (id, fileName) => {
     const confirmed = window.confirm(
@@ -56,52 +57,44 @@ console.log("viewStarred:", viewStarred, "viewTrash:", viewTrash);
     if (!confirmed) return;
 
     await axios.put(`http://localhost:8080/api/files/${id}/trash`);
-    loadFiles(); // refresh current view
+    loadFiles();
   };
 
-  // Filter files based on search term
+  // Filter files based on search term & view
   const filteredFiles = files
-  .filter((file) => !viewTrash ? !file.deleted : true) // 👈 Exclude deleted if not in trash
-  .filter((file) =>
-    file.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+    .filter((file) => (!viewTrash ? !file.deleted : true))
+    .filter((file) =>
+      file.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   return (
     <div className="main-layout">
       <Sidebar
-
-  onFileSelect={handleUploadFromSidebar}
-  onTrashClick={() => {
-    setViewTrash(true);
-    setViewStarred(false);
-  }}
-  onMyDriveClick={() => {
-    setViewTrash(false);
-    setViewStarred(false);
-  }}
-  onStarredClick={() => {
-    setViewStarred(true);
-    setViewTrash(false);
-  }}
-  
-
-
-/>
+        onFileSelect={handleUploadFromSidebar}
+        onTrashClick={() => {
+          setViewTrash(true);
+          setViewStarred(false);
+        }}
+        onMyDriveClick={() => {
+          setViewTrash(false);
+          setViewStarred(false);
+        }}
+        onStarredClick={() => {
+          setViewStarred(true);
+          setViewTrash(false);
+        }}
+      />
 
       <div className="content-area">
         <Header onSearch={setSearchTerm} />
-         <h2 style={{ marginBottom: "16px", fontWeight: "600" }}>
-        {viewTrash
-          ? "Trash"
-          : viewStarred
-          ? "Starred"
-          : "My Drive"}{" "}
-        ({filteredFiles.length} files)
-      </h2>
 
-        <h2 style={{ marginBottom: "10px" }}>
-          {viewTrash ? "🗑️ Trash" : "📁 My Drive"}
+        <h2 style={{ marginBottom: "16px", fontWeight: "600" }}>
+          {viewTrash
+            ? "🗑️ Trash"
+            : viewStarred
+            ? "⭐ Starred"
+            : "📁 My Drive"}{" "}
+          ({filteredFiles.length} files)
         </h2>
 
         {filteredFiles.length === 0 ? (
@@ -115,13 +108,12 @@ console.log("viewStarred:", viewStarred, "viewTrash:", viewTrash);
           <div className="files-grid">
             {filteredFiles.map((file) => (
               <FileCard
-  key={file.id}
-  file={file}
-  onDownload={handleDownload}
-  onDelete={() => handleDelete(file.id, file.name)}
-  onToggleStar={()=>handleToggleStar(file.id)}
-/>
-
+                key={file.id}
+                file={file}
+                onDownload={handleDownload}
+                onDelete={() => handleDelete(file.id, file.name)}
+                onToggleStar={() => handleToggleStar(file.id)}
+              />
             ))}
           </div>
         )}
@@ -131,4 +123,3 @@ console.log("viewStarred:", viewStarred, "viewTrash:", viewTrash);
 }
 
 export default DriveApp;
-
